@@ -1,26 +1,45 @@
 package com.iis.service;
 
-import java.io.Serializable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
+import com.iis.controller.ProductsController;
+import com.iis.dao.ProductDao;
 import com.iis.entities.Product;
+import com.iis.pojo.Response;
 
-@Repository
-public interface ProductService<T, ID extends Serializable> extends JpaRepository<T, ID>{
+@Service
+public class ProductService {
 	
-	@Query("select * from Product p where p.productName = :productName")
-	Product findProductByProductName(@Param("productName") String productName);
+	@Autowired
+	private ProductDao<Product, Integer> productDao;
+	private Logger logger = LoggerFactory.getLogger(ProductsController.class);
 	
-	/* Product findProductByProductName(String productName); 
-	 * 
-	 * We can call this method with out providing any explicit Query
-	 * because spring data can understand and internally creates the query by reading
-	 * method name.*/
+	public Response addProduct(Product product) {
+		Response response;
+		productDao.save(product);
+		response = new Response(true, "Product added successfully");
+		logger.info("Product Added Successfully : "+response);
+		
+		return response;
+	}
 	
-	@Query("update Product p set p.price = :price, p.msrp = :msrp where p.productId = :productId")
-	int updateProduct(@Param("productId") int productId, @Param("price") double price, @Param("msrp") double msrp);
+	public Product getProduct(String productName) {
+		return productDao.findProductByProductName(productName);
+	}
+	
+	public int updateProduct(int productId, double price, double msrp) {
+		return productDao.updateProduct(productId, price, msrp);
+	}
+	
+	public Response deleteProduct(int productId) {
+		Response response;
+		productDao.deleteById(productId);
+		response = new Response(true, "Product deleted successfully");
+		logger.info("Product deleted successfully : "+response);
+		
+		return response;
+	}
 }
