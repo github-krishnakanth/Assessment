@@ -15,7 +15,7 @@ public class ProductService {
 	
 	@Autowired
 	private ProductDao<Product, Integer> productDao;
-	private Logger logger = LoggerFactory.getLogger(ProductsController.class);
+	private Logger logger = LoggerFactory.getLogger(ProductService.class);
 	
 	public Response addProduct(Product product) {
 		Response response;
